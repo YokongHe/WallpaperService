@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "PicServlet")
 public class PicServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -21,6 +20,7 @@ public class PicServlet extends HttpServlet {
         PrintWriter out = null;
         try {
             out = response.getWriter();
+            out.write("test");
 //            out.write(jsonStr);
         } catch (IOException e) {
             e.printStackTrace();

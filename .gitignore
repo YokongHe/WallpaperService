@@ -1,3 +1,5 @@
-/.idea/workspace.xml
-.idea/inspectionProfiles/
 web/WEB-INF/lib/
+.idea/
+src/main/resources/
+src/test/
+target/
