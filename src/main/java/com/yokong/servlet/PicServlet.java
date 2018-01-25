@@ -2,6 +2,7 @@ package com.yokong.servlet;
 
 import com.google.gson.Gson;
 import com.yokong.data.DataProvider;
+import org.apache.http.util.TextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class PicServlet extends HttpServlet {
+    private static final String ACTION_REFRESH = "refresh";
+
     public PicServlet() {
         super();
     }
@@ -23,6 +26,12 @@ public class PicServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         DataProvider provider = DataProvider.getInstance();
+        String action = request.getParameter("action");
+        if (!TextUtils.isEmpty(action)) {
+            if (action.equals(ACTION_REFRESH)) {
+                provider.refreshDataFromCOS();
+            }
+        }
         response.setCharacterEncoding("UTF-8");
         response.setHeader("content-type", "application/json;charset=UTF-8");
 

@@ -48,7 +48,6 @@
         <jarDirectory url="file://$MODULE_DIR$/web/WEB-INF/lib" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" exported="" name="servlet-api" level="project" />
     <orderEntry type="library" name="Maven: com.qcloud:cos_api:5.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.6" level="project" />

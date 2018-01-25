@@ -19,6 +19,7 @@ public class DataProvider {
     private static final String SECRET_KEY = "3rSovnRq0wd5IFwNYT9gBSVJtELTUVQH";
     private static final String BUCKET_NAME = "yokonghe-1255950575";
     private static final String REGION_NAME = "ap-guangzhou";
+    private static final String CDN_URL = "https://yokonghe-1255950575.file.myqcloud.com/";
 
     private COSClient mCosClient;
     private List<String> mPhotoList;
@@ -56,7 +57,7 @@ public class DataProvider {
         timer.schedule(new RefreshTimerTask(), delay, delay);
     }
 
-    private void refreshDataFromCOS() {
+    public void refreshDataFromCOS() {
         // 获取 bucket 下成员（设置 delimiter）
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
         listObjectsRequest.setBucketName(BUCKET_NAME);
@@ -75,22 +76,27 @@ public class DataProvider {
         // 判断是否已经 list 完, 如果 list 结束, 则 isTruncated 为 false, 否则为 true
         boolean isTruncated = objectListing.isTruncated();
         List<COSObjectSummary> objectSummaries = objectListing.getObjectSummaries();
-
         if (objectSummaries == null || objectSummaries.size() == 0) {
             return;
         }
+        Collections.sort(objectSummaries, new Comparator<COSObjectSummary>() {
+            public int compare(COSObjectSummary o1, COSObjectSummary o2) {
+                return o2.getLastModified().compareTo(o1.getLastModified());
+            }
+        });
         synchronized (DataProvider.class) {
             mPhotoList = new ArrayList<String>();
             for (COSObjectSummary cosObjectSummary : objectSummaries) {
                 // 文件路径
                 String key = cosObjectSummary.getKey();
-                GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(BUCKET_NAME, key, HttpMethodName.GET);
-                // 设置签名过期时间(可选), 最大允许设置签名一个月有效, 若未进行设置, 则默认使用ClientConfig中的签名过期时间(5分钟)
-                // 这里设置签名在半个小时后过期
-                Date expirationDate = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
-                req.setExpiration(expirationDate);
-                URL url = mCosClient.generatePresignedUrl(req);
-                mPhotoList.add(url.toString());
+                // GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(BUCKET_NAME, key,
+                // HttpMethodName.GET);
+                // // 设置签名过期时间(可选), 最大允许设置签名一个月有效, 若未进行设置, 则默认使用ClientConfig中的签名过期时间(5分钟)
+                // // 这里设置签名在半个小时后过期
+                // Date expirationDate = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+                // req.setExpiration(expirationDate);
+                // URL url = mCosClient.generatePresignedUrl(req);
+                mPhotoList.add(CDN_URL + key);
             }
         }
     }
