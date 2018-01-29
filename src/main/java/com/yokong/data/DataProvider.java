@@ -22,7 +22,7 @@ public class DataProvider {
     private static final String CDN_URL = "https://yokonghe-1255950575.file.myqcloud.com/";
 
     private COSClient mCosClient;
-    private List<String> mPhotoList;
+    private List<PhotoUrl> mPhotoList;
 
 
     private static DataProvider sInstance;
@@ -85,9 +85,10 @@ public class DataProvider {
             }
         });
         synchronized (DataProvider.class) {
-            mPhotoList = new ArrayList<String>();
+            mPhotoList = new ArrayList<PhotoUrl>();
             for (COSObjectSummary cosObjectSummary : objectSummaries) {
                 // 文件路径
+                PhotoUrl photoUrl = new PhotoUrl();
                 String key = cosObjectSummary.getKey();
                 // GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(BUCKET_NAME, key,
                 // HttpMethodName.GET);
@@ -96,7 +97,10 @@ public class DataProvider {
                 // Date expirationDate = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
                 // req.setExpiration(expirationDate);
                 // URL url = mCosClient.generatePresignedUrl(req);
-                mPhotoList.add(CDN_URL + key);
+
+                photoUrl.url = CDN_URL + key;
+                photoUrl.thumbUrl = CDN_URL + "thumb/thumb-" + key;
+                mPhotoList.add(photoUrl);
             }
         }
     }
@@ -108,13 +112,13 @@ public class DataProvider {
      * @return 圖片列表和信息
      */
     public PhotoList getPhotoList(int sort) {
-        List<String> allList = mPhotoList;
+        List<PhotoUrl> allList = mPhotoList;
         int size = allList.size();
         if (sort * 10 > size) {
             return null;
         }
         PhotoList photoList = new PhotoList();
-        List<String> photos;
+        List<PhotoUrl> photos;
         boolean isEnd;
         if ((sort + 1) * 10 >= size) {
             photos = allList.subList(sort * 10, allList.size());
@@ -130,9 +134,14 @@ public class DataProvider {
     }
 
     public class PhotoList {
-        List<String> photos;
+        List<PhotoUrl> photos;
         int sort;
         boolean isEnd;
+    }
+
+    public class PhotoUrl {
+        String thumbUrl;
+        String url;
     }
 
     class RefreshTimerTask extends TimerTask {
